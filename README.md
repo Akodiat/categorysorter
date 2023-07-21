@@ -1,5 +1,7 @@
 # Category sorter
 
+Run `npm run deploy` to create a bundled bersion of the app and push it to the `gh-pages` branch on GitHub.
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
