@@ -1,15 +1,15 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Draggable } from 'react-beautiful-dnd';
-import { EditText } from 'react-edit-text';
 import 'react-edit-text/dist/index.css';
 
 const Container = styled.div`
   border: 1px solid lightgrey;
   border-radius: 2px;
   margin: 2px;
-  padding: 2px;
-  background-color: ${props => (props.isDragging ? 'lightgreen' : 'white')};
+  padding: 4px;
+  min-width: 10em;
+  background-color: ${props => (props.isDragging ? '#F7E4E0' : 'white')};
 `;
 
 // Dont animate a transition back to the original row if we drag
@@ -38,10 +38,7 @@ export default class Task extends React.Component {
             aria-roledescription="Press space bar to lift the task"
             style={getStyle(provided.draggableProps.style, snapshot)}
           >
-            <EditText
-              defaultValue={this.props.task.content}
-              onSave={(_, value) => this.props.task.content = value}
-            />
+          {this.props.task.content}
           </Container>
         )}
       </Draggable>

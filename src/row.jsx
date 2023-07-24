@@ -19,7 +19,7 @@ const TaskList = styled.div`
   padding: 8px;
   transition: background-color 0.2s ease;
   background-color: ${props =>
-    props.isDraggingOver ? 'lightgrey' : 'inherit'};
+    props.isDraggingOver ? '#BED0F4' : 'inherit'};
   display: flex;
   flex-grow: 1;
   overflow: auto;
@@ -40,6 +40,10 @@ class InnerList extends React.Component {
 }
 
 export default class Row extends React.Component {
+  updateTitle = (e) => {
+    console.log(e.value);
+  }
+
   render() {
     return (
       <Draggable draggableId={this.props.row.id} index={this.props.index}>
@@ -48,7 +52,7 @@ export default class Row extends React.Component {
             <Title {...provided.dragHandleProps}>
               <EditText
                 defaultValue={this.props.row.title}
-                onSave={(_, value) => this.props.row.title = value}
+                onSave={this.updateTitle}
               />
             </Title>
             <Droppable

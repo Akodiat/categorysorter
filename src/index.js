@@ -2,10 +2,24 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import '@atlaskit/css-reset';
 import styled from 'styled-components';
-import { DragDropContext, Droppable } from 'react-beautiful-dnd';
+import {DragDropContext, Droppable} from 'react-beautiful-dnd';
 import initialData from './initial-data';
 import Row from './row';
-import CSVReader from './csvReader'
+import {saveState, readCSV, readJSON} from './io';
+
+
+const FileInput = styled.input`
+  border: '1px solid #ccc',
+  height: 45px,
+  lineHeight: 2.5px,
+  paddingLeft: 10px,
+  background: #8BA6E9
+`;
+
+const SaveButton = styled.button`
+  background: #7E96C4
+`;
+
 
 const Container = styled.div`
   display: flex;
@@ -22,6 +36,29 @@ class InnerList extends React.PureComponent {
 
 class App extends React.Component {
   state = initialData;
+
+  saveState = () => {
+    saveState(this.state, this.filename);
+  }
+
+  onFileUpload = (event) => {
+    const file = event.target.files[0];
+    const splitName = file.name.split('.');
+    this.filename = splitName.slice(0, -1).join('.');
+    const [suffix] = splitName.slice(-1);
+    if (suffix === 'csv') {
+      readCSV(file, newState=>{
+        this.setState(newState);
+      });
+
+    } else if (suffix === 'json') {
+      readJSON(file, newState=>{
+        this.setState(newState);
+      });
+    } else {
+      alert(`Unable to read files of type "${suffix}". Please use "csv" or "json" instead.`)
+    }
+  }
 
   onDragEnd = (result, provided) => {
     let { destination, source, draggableId, type } = result;
@@ -145,9 +182,8 @@ class App extends React.Component {
   render() {
     return (
       <div>
-      <CSVReader>
-
-      </CSVReader>
+      <FileInput type='file' onChange={this.onFileUpload}/>
+      <SaveButton onClick={this.saveState}>Save</SaveButton>
       <DragDropContext
         onDragStart={this.onDragStart}
         onDragUpdate={this.onDragUpdate}
