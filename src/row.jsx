@@ -34,14 +34,14 @@ class InnerList extends React.Component {
   }
   render() {
     return this.props.tasks.map((task, index) => (
-      <Task key={task.id} task={task} index={index} />
+      <Task key={task.id} task={task} index={index}/>
     ));
   }
 }
 
 export default class Row extends React.Component {
-  updateTitle = (e) => {
-    console.log(e.value);
+  updateTitle = (e, props) => {
+    props.updateTitle(props.row.id, e.value);
   }
 
   render() {
@@ -52,7 +52,7 @@ export default class Row extends React.Component {
             <Title {...provided.dragHandleProps}>
               <EditText
                 defaultValue={this.props.row.title}
-                onSave={this.updateTitle}
+                onSave={e=>this.updateTitle(e, this.props)}
               />
             </Title>
             <Droppable
@@ -66,7 +66,7 @@ export default class Row extends React.Component {
                   {...provided.droppableProps}
                   isDraggingOver={snapshot.isDraggingOver}
                 >
-                  <InnerList tasks={this.props.tasks} />
+                  <InnerList tasks={this.props.tasks}/>
                   {provided.placeholder}
                 </TaskList>
               )}

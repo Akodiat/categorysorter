@@ -28,9 +28,14 @@ const Container = styled.div`
 
 class InnerList extends React.PureComponent {
   render() {
-    const { row, taskMap, index } = this.props;
+    const { row, taskMap, index, updateTitle } = this.props;
     const tasks = row.taskIds.map(taskId => taskMap[taskId]);
-    return <Row row={row} tasks={tasks} index={index} />;
+    return <Row
+      row={row}
+      tasks={tasks}
+      index={index}
+      updateTitle={updateTitle}
+    />;
   }
 }
 
@@ -58,6 +63,20 @@ class App extends React.Component {
     } else {
       alert(`Unable to read files of type "${suffix}". Please use "csv" or "json" instead.`)
     }
+  }
+
+  updateTitle = (rowId, newTitle) => {
+    const newState = {
+      ...this.state,
+      rows: {
+        ...this.state.rows,
+        [rowId]: {
+          ...this.state.rows[rowId],
+          title: newTitle
+        }
+      }
+    }
+    this.setState(newState);
   }
 
   onDragEnd = (result, provided) => {
@@ -207,6 +226,7 @@ class App extends React.Component {
                     row={row}
                     taskMap={this.state.tasks}
                     index={index}
+                    updateTitle={this.updateTitle}
                   />
                 );
               })}
