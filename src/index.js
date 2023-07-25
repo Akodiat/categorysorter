@@ -6,22 +6,13 @@ import {DragDropContext, Droppable} from 'react-beautiful-dnd';
 import initialData from './initial-data';
 import Row from './row';
 import {saveState, readCSV, readJSON} from './io';
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
+import Jumbotron from 'react-bootstrap/Jumbotron';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 
-const FileInput = styled.input`
-  border: '1px solid #ccc',
-  height: 45px,
-  lineHeight: 2.5px,
-  paddingLeft: 10px,
-  background: #8BA6E9
-`;
-
-const SaveButton = styled.button`
-  background: #7E96C4
-`;
-
-
-const Container = styled.div`
+const RowContainer = styled.div`
   display: flex;
   flex-direction: column;
 `;
@@ -201,8 +192,20 @@ class App extends React.Component {
   render() {
     return (
       <div>
-      <FileInput type='file' onChange={this.onFileUpload}/>
-      <SaveButton onClick={this.saveState}>Save</SaveButton>
+        <Jumbotron>
+          <h1>Category sorter</h1>
+          <p>
+            Drag and drop items to change their order. <b>Create a new category by dropping an item outside any existing category.</b>
+          </p>
+          <p>
+            Input a csv file with the items to be sorted in the first column. You may also upload a sorted JSON file saved from this app.
+          </p>
+          <Form.Group controlId="formFileLg" className="mb-3">
+            <Form.File size="lg" onChange={this.onFileUpload}/>
+          </Form.Group>
+          <Button variant="primary" onClick={this.saveState} title="
+          Save the current state as a JSON file.">Save current state</Button>
+        </Jumbotron>
       <DragDropContext
         onDragStart={this.onDragStart}
         onDragUpdate={this.onDragUpdate}
@@ -214,7 +217,7 @@ class App extends React.Component {
           type="row"
         >
           {provided => (
-            <Container
+            <RowContainer
               {...provided.droppableProps}
               innerRef={provided.innerRef}
             >
@@ -231,7 +234,7 @@ class App extends React.Component {
                 );
               })}
               {provided.placeholder}
-            </Container>
+            </RowContainer>
           )}
         </Droppable>
       </DragDropContext>
