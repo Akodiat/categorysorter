@@ -4,7 +4,7 @@ import '@atlaskit/css-reset';
 import styled from 'styled-components';
 import {DragDropContext, Droppable} from 'react-beautiful-dnd';
 import initialData from './initial-data';
-import Row from './row';
+import Row from './category';
 import {saveState, readCSV, readJSON} from './io';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
@@ -19,11 +19,11 @@ const RowContainer = styled.div`
 
 class InnerList extends React.PureComponent {
   render() {
-    const { row, taskMap, index, updateTitle } = this.props;
-    const tasks = row.taskIds.map(taskId => taskMap[taskId]);
+    const { category, itemMap, index, updateTitle } = this.props;
+    const items = category.itemIds.map(itemId => itemMap[itemId]);
     return <Row
-      row={row}
-      tasks={tasks}
+      category={category}
+      items={items}
       index={index}
       updateTitle={updateTitle}
     />;
@@ -59,10 +59,10 @@ class App extends React.Component {
   updateTitle = (rowId, newTitle) => {
     const newState = {
       ...this.state,
-      rows: {
-        ...this.state.rows,
+      categories: {
+        ...this.state.categories,
         [rowId]: {
-          ...this.state.rows[rowId],
+          ...this.state.categories[rowId],
           title: newTitle
         }
       }
@@ -75,34 +75,34 @@ class App extends React.Component {
 
     if (!destination) {
 
-      if (type === 'row') {
+      if (type === 'category') {
         return;
       }
-      const newIdCount = this.state.rowIdCounter + 1;
+      const newIdCount = this.state.categoryIdCounter + 1;
       this.setState({
         ...this.state,
-        rowIdCounter: newIdCount
+        categoryIdCounter: newIdCount
       })
-      const newId = `row-${newIdCount}`;
-      console.assert(this.state.rows[newId] === undefined, "Row already exists");
+      const newId = `category-${newIdCount}`;
+      console.assert(this.state.categories[newId] === undefined, "Row already exists");
 
       destination = {
         droppableId: newId,
         index: 0
       }
 
-      const newRowOrder = Array.from(this.state.rowOrder);
+      const newRowOrder = Array.from(this.state.categoryOrder);
       newRowOrder.push(newId);
 
       const newState = {
         ...this.state,
-        rowOrder: newRowOrder,
-        rows: {
-          ...this.state.rows,
+        categoryOrder: newRowOrder,
+        categories: {
+          ...this.state.categories,
           [newId]: {
             id: newId,
             title: 'New group '+newIdCount,
-            taskIds: [],
+            itemIds: [],
           },
         }
       };
@@ -117,36 +117,36 @@ class App extends React.Component {
       return;
     }
 
-    if (type === 'row') {
-      const newRowOrder = Array.from(this.state.rowOrder);
+    if (type === 'category') {
+      const newRowOrder = Array.from(this.state.categoryOrder);
       newRowOrder.splice(source.index, 1);
       newRowOrder.splice(destination.index, 0, draggableId);
 
       const newState = {
         ...this.state,
-        rowOrder: newRowOrder,
+        categoryOrder: newRowOrder,
       };
       this.setState(newState);
       return;
     }
 
-    const home = this.state.rows[source.droppableId];
-    const foreign = this.state.rows[destination.droppableId];
+    const home = this.state.categories[source.droppableId];
+    const foreign = this.state.categories[destination.droppableId];
 
     if (home === foreign) {
-      const newTaskIds = Array.from(home.taskIds);
-      newTaskIds.splice(source.index, 1);
-      newTaskIds.splice(destination.index, 0, draggableId);
+      const newItemIds = Array.from(home.itemIds);
+      newItemIds.splice(source.index, 1);
+      newItemIds.splice(destination.index, 0, draggableId);
 
       const newHome = {
         ...home,
-        taskIds: newTaskIds,
+        itemIds: newItemIds,
       };
 
       const newState = {
         ...this.state,
-        rows: {
-          ...this.state.rows,
+        categories: {
+          ...this.state.categories,
           [newHome.id]: newHome,
         },
       };
@@ -156,35 +156,35 @@ class App extends React.Component {
     }
 
     // moving from one list to another
-    const homeTaskIds = Array.from(home.taskIds);
-    homeTaskIds.splice(source.index, 1);
+    const homeItemIds = Array.from(home.itemIds);
+    homeItemIds.splice(source.index, 1);
     const newHome = {
       ...home,
-      taskIds: homeTaskIds,
+      itemIds: homeItemIds,
     };
 
-    const foreignTaskIds = Array.from(foreign.taskIds);
-    foreignTaskIds.splice(destination.index, 0, draggableId);
+    const foreignItemIds = Array.from(foreign.itemIds);
+    foreignItemIds.splice(destination.index, 0, draggableId);
     const newForeign = {
       ...foreign,
-      taskIds: foreignTaskIds,
+      itemIds: foreignItemIds,
     };
 
     let newRows = {
-      ...this.state.rows,
+      ...this.state.categories,
       [newHome.id]: newHome,
       [newForeign.id]: newForeign,
     }
-    const newRowOrder = Array.from(this.state.rowOrder);
-    if (homeTaskIds.length === 0) {
+    const newRowOrder = Array.from(this.state.categoryOrder);
+    if (homeItemIds.length === 0) {
       delete newRows[newHome.id];
       newRowOrder.splice(newRowOrder.indexOf(newHome.id), 1);
     }
 
     const newState = {
       ...this.state,
-      rows: newRows,
-      rowOrder: newRowOrder
+      categories: newRows,
+      categoryOrder: newRowOrder
     };
     this.setState(newState);
   };
@@ -212,22 +212,22 @@ class App extends React.Component {
         onDragEnd={this.onDragEnd}
       >
         <Droppable
-          droppableId="all-rows"
+          droppableId="all-categories"
           direction="vertical"
-          type="row"
+          type="category"
         >
           {provided => (
             <RowContainer
               {...provided.droppableProps}
               innerRef={provided.innerRef}
             >
-              {this.state.rowOrder.map((rowId, index) => {
-                const row = this.state.rows[rowId];
+              {this.state.categoryOrder.map((rowId, index) => {
+                const category = this.state.categories[rowId];
                 return (
                   <InnerList
-                    key={row.id}
-                    row={row}
-                    taskMap={this.state.tasks}
+                    key={category.id}
+                    category={category}
+                    itemMap={this.state.items}
                     index={index}
                     updateTitle={this.updateTitle}
                   />

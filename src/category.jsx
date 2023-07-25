@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 import { EditText } from 'react-edit-text';
-import Task from './task';
+import Item from './item';
 
 const Container = styled.div`
   margin: 8px;
@@ -15,7 +15,7 @@ const Container = styled.div`
 const Title = styled.h3`
   padding: 8px;
 `;
-const TaskList = styled.div`
+const ItemList = styled.div`
   padding: 8px;
   transition: background-color 0.2s ease;
   background-color: ${props =>
@@ -27,48 +27,48 @@ const TaskList = styled.div`
 
 class InnerList extends React.Component {
   shouldComponentUpdate(nextProps) {
-    if (nextProps.tasks === this.props.tasks) {
+    if (nextProps.items === this.props.items) {
       return false;
     }
     return true;
   }
   render() {
-    return this.props.tasks.map((task, index) => (
-      <Task key={task.id} task={task} index={index}/>
+    return this.props.items.map((item, index) => (
+      <Item key={item.id} item={item} index={index}/>
     ));
   }
 }
 
 export default class Row extends React.Component {
   updateTitle = (e, props) => {
-    props.updateTitle(props.row.id, e.value);
+    props.updateTitle(props.category.id, e.value);
   }
 
   render() {
     return (
-      <Draggable draggableId={this.props.row.id} index={this.props.index}>
+      <Draggable draggableId={this.props.category.id} index={this.props.index}>
         {provided => (
           <Container {...provided.draggableProps} innerRef={provided.innerRef}>
             <Title {...provided.dragHandleProps}>
               <EditText
-                defaultValue={this.props.row.title}
+                defaultValue={this.props.category.title}
                 onSave={e=>this.updateTitle(e, this.props)}
               />
             </Title>
             <Droppable
-              droppableId={this.props.row.id}
-              type="task"
+              droppableId={this.props.category.id}
+              type="item"
               direction="horizontal"
             >
               {(provided, snapshot) => (
-                <TaskList
+                <ItemList
                   innerRef={provided.innerRef}
                   {...provided.droppableProps}
                   isDraggingOver={snapshot.isDraggingOver}
                 >
-                  <InnerList tasks={this.props.tasks}/>
+                  <InnerList items={this.props.items}/>
                   {provided.placeholder}
-                </TaskList>
+                </ItemList>
               )}
             </Droppable>
           </Container>

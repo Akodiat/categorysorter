@@ -11,17 +11,17 @@ function saveFile(text, filename, type='text/plain') {
     a.click();
     setTimeout(function() {
         document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);  
-    }, 0); 
+        window.URL.revokeObjectURL(url);
+    }, 0);
 }
 
 function saveState(state, filename='categorised.json') {
-    const data = state.rowOrder.map(rowId=>{
-        const category = state.rows[rowId];
-        const tasks = category.taskIds.map(taskId=>state.tasks[taskId].content);
+    const data = state.categoryOrder.map(rowId=>{
+        const category = state.categories[rowId];
+        const items = category.itemIds.map(itemId=>state.items[itemId].content);
         return {
             title: category.title,
-            tasks: tasks
+            items: items
         }
     });
     saveFile(JSON.stringify(data, undefined, 2), filename, 'application/json')
@@ -33,25 +33,25 @@ function readJSON(file, callback) {
         const data = JSON.parse(e.target.result);
 
         const newState = {
-            tasks: {},
-            rows: {},
-            rowOrder: [],
-            rowIdCounter: 0
+            items: {},
+            categories: {},
+            categoryOrder: [],
+            categoryIdCounter: 0
         };
 
-        data.forEach((row, iRow)=>{
-            const rowId = `row-${iRow}`;
-            newState.rows[rowId] = {
+        data.forEach((category, iRow)=>{
+            const rowId = `category-${iRow}`;
+            newState.categories[rowId] = {
                 id: rowId,
-                title: row.title,
-                taskIds: []
+                title: category.title,
+                itemIds: []
             };
-            row.tasks.forEach((item, iTask)=>{
-                const id = `task-${iTask}`;
-                newState.tasks[id] = {id: id, content: item};
-                newState.rows[rowId].taskIds.push(id);
+            category.items.forEach((item, iItem)=>{
+                const id = `item-${iItem}`;
+                newState.items[id] = {id: id, content: item};
+                newState.categories[rowId].itemIds.push(id);
             });
-            newState.rowOrder.push(rowId);
+            newState.categoryOrder.push(rowId);
         });
 
         callback(newState);
@@ -62,25 +62,25 @@ function readJSON(file, callback) {
 function readCSV(file, callback) {
     Papa.parse(file, {
         complete: (results) => {
-          const items = results.data.map(row=>row[0]);
-          const tasks = {};
-          const taskIds =  [];
-          items.forEach((item, i) => {
-            const id = `task-${i}`;
-            tasks[id] = {id: id, content: item};
-            taskIds.push(id);
+          const lines = results.data.map(category=>category[0]);
+          const items = {};
+          const itemIds =  [];
+          lines.forEach((item, i) => {
+            const id = `item-${i}`;
+            items[id] = {id: id, content: item};
+            itemIds.push(id);
           });
           const newState = {
-            tasks: tasks,
-            rows: {
-              'row-0': {
-                id: 'row-0',
+            items: items,
+            categories: {
+              'category-0': {
+                id: 'category-0',
                 title: 'Ungrouped',
-                taskIds: taskIds,
+                itemIds: itemIds,
               },
             },
-            rowOrder: ['row-0'],
-            rowIdCounter: 0
+            categoryOrder: ['category-0'],
+            categoryIdCounter: 0
           };
 
           console.log(`Loaded ${items.length} items`);

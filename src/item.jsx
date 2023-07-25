@@ -12,7 +12,7 @@ const Container = styled.div`
   background-color: ${props => (props.isDragging ? '#F7E4E0' : 'white')};
 `;
 
-// Dont animate a transition back to the original row if we drag
+// Dont animate a transition back to the original category if we drag
 // outside the categories (creating a new category)
 function getStyle(style, snapshot) {
   if (snapshot.isDropAnimating && snapshot.draggingOver === null) {
@@ -25,20 +25,20 @@ function getStyle(style, snapshot) {
   return style;
 }
 
-export default class Task extends React.Component {
+export default class Item extends React.Component {
   render() {
     return (
-      <Draggable draggableId={this.props.task.id} index={this.props.index}>
+      <Draggable draggableId={this.props.item.id} index={this.props.index}>
         {(provided, snapshot) => (
           <Container
             {...provided.draggableProps}
             {...provided.dragHandleProps}
             innerRef={provided.innerRef}
             isDragging={snapshot.isDragging}
-            aria-roledescription="Press space bar to lift the task"
+            aria-roledescription="Press space bar to lift the item"
             style={getStyle(provided.draggableProps.style, snapshot)}
           >
-          {this.props.task.content}
+          {this.props.item.content}
           </Container>
         )}
       </Draggable>
