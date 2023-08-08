@@ -1,4 +1,5 @@
 import Papa from 'papaparse';
+import readXlsxFile from 'read-excel-file'
 
 // Function to save text to a file
 function saveFile(text, filename, type='text/plain') {
@@ -62,31 +63,45 @@ function readJSON(file, callback) {
 function readCSV(file, callback) {
     Papa.parse(file, {
         complete: (results) => {
-          const lines = results.data.map(category=>category[0]);
-          const items = {};
-          const itemIds =  [];
-          lines.forEach((item, i) => {
-            const id = `item-${i}`;
-            items[id] = {id: id, content: item};
-            itemIds.push(id);
-          });
-          const newState = {
-            items: items,
-            categories: {
-              'category-0': {
-                id: 'category-0',
-                title: 'Ungrouped',
-                itemIds: itemIds,
-              },
-            },
-            categoryOrder: ['category-0'],
-            categoryIdCounter: 0
-          };
-
-          console.log(`Loaded ${items.length} items`);
-          callback(newState);
+            const lines = results.data.map(row=>row[0]);
+            const newState = stateFromLines(lines);
+            console.log(`Loaded ${lines.length} items`);
+            callback(newState);
         }
       });
 }
 
-export {saveFile, saveState, readCSV, readJSON}
+function stateFromLines(lines) {
+    const items = {};
+    const itemIds =  [];
+    lines.forEach((item, i) => {
+      const id = `item-${i}`;
+      items[id] = {id: id, content: item};
+      itemIds.push(id);
+    });
+    const newState = {
+      items: items,
+      categories: {
+        'category-0': {
+          id: 'category-0',
+          title: 'Ungrouped',
+          itemIds: itemIds,
+        },
+      },
+      categoryOrder: ['category-0'],
+      categoryIdCounter: 0
+    };
+
+    return newState;
+}
+
+function readXLSX(file, callback) {
+    readXlsxFile(file).then((rows) => {
+        const lines = rows.map(row=>row[0]);
+        const newState = stateFromLines(lines);
+        console.log(`Loaded ${lines.length} items`);
+        callback(newState);
+      })
+}
+
+export {saveFile, saveState, readCSV, readJSON, readXLSX}

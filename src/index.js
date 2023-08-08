@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import {DragDropContext, Droppable} from 'react-beautiful-dnd';
 import initialData from './initial-data';
 import Row from './category';
-import {saveState, readCSV, readJSON} from './io';
+import {saveState, readCSV, readJSON, readXLSX} from './io';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Jumbotron from 'react-bootstrap/Jumbotron';
@@ -42,18 +42,19 @@ class App extends React.Component {
     const splitName = file.name.split('.');
     this.filename = splitName.slice(0, -1).join('.');
     const [suffix] = splitName.slice(-1);
-    if (suffix === 'csv') {
-      readCSV(file, newState=>{
-        this.setState(newState);
-      });
+    let fParse;
+    switch (suffix) {
+      case 'csv':  fParse = readCSV; break;
+      case 'xlsx': fParse = readXLSX; break;
+      case 'json': fParse = readJSON; break;
 
-    } else if (suffix === 'json') {
-      readJSON(file, newState=>{
-        this.setState(newState);
-      });
-    } else {
-      alert(`Unable to read files of type "${suffix}". Please use "csv" or "json" instead.`)
+      default:
+        alert(`Unable to read files of type "${suffix}". Please use "csv", "xlsx" or "json" instead.`);
+        return;
     }
+    fParse(file, newState=>{
+      this.setState(newState);
+    });
   }
 
   updateTitle = (rowId, newTitle) => {
