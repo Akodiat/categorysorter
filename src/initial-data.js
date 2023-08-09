@@ -21,7 +21,9 @@ const initialData = {
   },
   // Facilitate reordering of the categories
   categoryOrder: ['category-0', 'category-1'],
-  categoryIdCounter: 1
+  categoryIdCounter: 1,
+  // Indicate if sorting is done yet
+  doneSorting: false
 };
 
 export default initialData;

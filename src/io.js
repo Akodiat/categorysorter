@@ -17,7 +17,7 @@ function saveFile(text, filename, type='text/plain') {
 }
 
 function saveState(state, filename='categorised.json') {
-    const data = state.categoryOrder.map(rowId=>{
+    const categories = state.categoryOrder.map(rowId=>{
         const category = state.categories[rowId];
         const items = category.itemIds.map(itemId=>state.items[itemId].content);
         return {
@@ -25,6 +25,10 @@ function saveState(state, filename='categorised.json') {
             items: items
         }
     });
+    const data = {
+        categories: categories,
+        doneSorting: state.doneSorting
+    }
     saveFile(JSON.stringify(data, undefined, 2), filename, 'application/json')
 }
 
@@ -40,7 +44,7 @@ function readJSON(file, callback) {
             categoryIdCounter: 0
         };
 
-        data.forEach((category, iRow)=>{
+        data.categories.forEach((category, iRow)=>{
             const rowId = `category-${iRow}`;
             newState.categories[rowId] = {
                 id: rowId,
@@ -54,6 +58,7 @@ function readJSON(file, callback) {
             });
             newState.categoryOrder.push(rowId);
         });
+        newState.doneSorting = data.doneSorting;
 
         callback(newState);
     }

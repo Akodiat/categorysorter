@@ -33,6 +33,15 @@ class InnerList extends React.PureComponent {
 class App extends React.Component {
   state = initialData;
 
+  onToggleDoneSorting = (e) => {
+    const checked = e.target.checked;
+    const newState = {
+      ...this.state,
+      doneSorting: checked
+    }
+    this.setState(newState);
+  }
+
   saveState = () => {
     saveState(this.state, this.filename);
   }
@@ -203,6 +212,16 @@ class App extends React.Component {
           </p>
           <Form.Group controlId="formFileLg" className="mb-3">
             <Form.File size="lg" onChange={this.onFileUpload}/>
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Check
+              type="switch"
+              id="doneSortingSwitch"
+              label="Sorting finished?"
+              checked={this.state.doneSorting}
+              onChange={this.onToggleDoneSorting}
+            />
           </Form.Group>
           <Button variant="primary" onClick={this.saveState} title="
           Save the current state as a JSON file.">Save current state</Button>
