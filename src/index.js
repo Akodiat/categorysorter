@@ -240,6 +240,7 @@ class App extends React.Component {
               type="switch"
               id="doneSortingSwitch"
               label="Sorting finished?"
+              title={`Check this when you consider everything sorted into categories (you have spent ${Math.round(this.state.activeTime / 60)} minutes sorting)`}
               checked={this.state.doneSorting}
               onChange={this.onToggleDoneSorting}
             />
