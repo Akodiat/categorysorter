@@ -4,6 +4,7 @@ import '@atlaskit/css-reset';
 import styled from 'styled-components';
 import {DragDropContext, Droppable} from 'react-beautiful-dnd';
 import initialData from './initial-data';
+import {ActivityTimer} from './ActivityTimer';
 import Row from './category';
 import {saveState, readCSV, readJSON, readXLSX} from './io';
 import Form from 'react-bootstrap/Form';
@@ -33,6 +34,19 @@ class InnerList extends React.PureComponent {
 class App extends React.Component {
   state = initialData;
 
+  activityTimer = new ActivityTimer(
+    5 * 60, // 5 minutes idle time
+    10,      // 10 second tick length
+    this.state.activeTime,
+    newActiveTime => {
+      const newState = {
+        ...this.state,
+        activeTime: Math.round(newActiveTime)
+      }
+      this.setState(newState);
+    }
+  );
+
   onToggleDoneSorting = (e) => {
     const checked = e.target.checked;
     const newState = {
@@ -47,10 +61,13 @@ class App extends React.Component {
   }
 
   onFileUpload = (event) => {
+    // Parse file name and type
     const file = event.target.files[0];
     const splitName = file.name.split('.');
     this.filename = splitName.slice(0, -1).join('.');
     const [suffix] = splitName.slice(-1);
+
+    // Make sure to call the correct parser
     let fParse;
     switch (suffix) {
       case 'csv':  fParse = readCSV; break;
@@ -60,9 +77,10 @@ class App extends React.Component {
       default:
         alert(`Unable to read files of type "${suffix}". Please use "csv", "xlsx" or "json" instead.`);
         return;
-    }
-    fParse(file, newState=>{
-      this.setState(newState);
+      }
+      fParse(file, newState=>{
+        this.setState(newState);
+        this.activityTimer.reset(newState.activeTime);
     });
   }
 
@@ -201,7 +219,10 @@ class App extends React.Component {
 
   render() {
     return (
-      <div>
+      <div
+        onMouseMove={()=>{this.activityTimer.resetIdleTimer()}}
+        onKeyDown={()=>this.activityTimer.resetIdleTimer()}
+      >
         <Jumbotron>
           <h1>Category sorter</h1>
           <p>

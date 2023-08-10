@@ -27,7 +27,8 @@ function saveState(state, filename='categorised.json') {
     });
     const data = {
         categories: categories,
-        doneSorting: state.doneSorting
+        doneSorting: state.doneSorting,
+        activeTime: state.activeTime
     }
     saveFile(JSON.stringify(data, undefined, 2), filename, 'application/json')
 }
@@ -41,7 +42,9 @@ function readJSON(file, callback) {
             items: {},
             categories: {},
             categoryOrder: [],
-            categoryIdCounter: 0
+            categoryIdCounter: 0,
+            doneSorting: data.doneSorting,
+            activeTime: data.activeTime
         };
 
         data.categories.forEach((category, iRow)=>{
@@ -58,7 +61,6 @@ function readJSON(file, callback) {
             });
             newState.categoryOrder.push(rowId);
         });
-        newState.doneSorting = data.doneSorting;
 
         callback(newState);
     }
@@ -94,7 +96,9 @@ function stateFromLines(lines) {
         },
       },
       categoryOrder: ['category-0'],
-      categoryIdCounter: 0
+      categoryIdCounter: 0,
+      doneSorting: false,
+      activeTime: 0
     };
 
     return newState;
