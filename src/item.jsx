@@ -14,7 +14,7 @@ const Container = styled.div`
 
 // Dont animate a transition back to the original category if we drag
 // outside the categories (creating a new category)
-function getStyle(style, snapshot) {
+function getStyle(style, snapshot, props) {
   if (snapshot.isDropAnimating && snapshot.draggingOver === null) {
     return {
       ...style,
@@ -22,10 +22,20 @@ function getStyle(style, snapshot) {
       transition: `all`,
     };
   }
+  if (props.item.unique) {
+    return {
+      ...style,
+      background: '#92beff'
+    }
+  }
   return style;
 }
 
 export default class Item extends React.Component {
+  toggleUnique = (e,props) => {
+    props.toggleUnique(props.item.id);
+    e.preventDefault();
+  }
   render() {
     return (
       <Draggable draggableId={this.props.item.id} index={this.props.index}>
@@ -36,7 +46,8 @@ export default class Item extends React.Component {
             innerRef={provided.innerRef}
             isDragging={snapshot.isDragging}
             aria-roledescription="Press space bar to lift the item"
-            style={getStyle(provided.draggableProps.style, snapshot)}
+            style={getStyle(provided.draggableProps.style, snapshot, this.props)}
+            onDoubleClick={e=>this.toggleUnique(e,this.props)}
           >
           {this.props.item.content}
           </Container>

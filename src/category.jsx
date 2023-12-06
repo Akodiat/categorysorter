@@ -26,6 +26,10 @@ const ItemList = styled.div`
 `;
 
 class InnerList extends React.Component {
+  toggleUnique = (id) => {
+    this.props.toggleUnique(id);
+  }
+
   shouldComponentUpdate(nextProps) {
     if (nextProps.items === this.props.items) {
       return false;
@@ -34,12 +38,20 @@ class InnerList extends React.Component {
   }
   render() {
     return this.props.items.map((item, index) => (
-      <Item key={item.id} item={item} index={index}/>
+      <Item
+        key={item.id}
+        item={item}
+        index={index}
+        toggleUnique={id=>this.toggleUnique(id)}/>
     ));
   }
 }
 
 export default class Row extends React.Component {
+  toggleUnique = (id) => {
+    this.props.toggleUnique(id);
+  }
+
   updateTitle = (e, props) => {
     props.updateTitle(props.category.id, e.value);
   }
@@ -66,7 +78,9 @@ export default class Row extends React.Component {
                   {...provided.droppableProps}
                   isDraggingOver={snapshot.isDraggingOver}
                 >
-                  <InnerList items={this.props.items}/>
+                <InnerList
+                  items={this.props.items}
+                  toggleUnique={id=>this.toggleUnique(id)}/>
                   {provided.placeholder}
                 </ItemList>
               )}

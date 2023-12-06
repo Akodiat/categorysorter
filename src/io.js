@@ -67,14 +67,60 @@ function readJSON(file, callback) {
     reader.readAsText(file);
 }
 
+function saveCSV(state, filename="output.csv") {
+    let lines = ["cluster_label;idea;unique_idea"];
+    state.categoryOrder.forEach(label=>{
+        const category = state.categories[label];
+        category.itemIds.forEach(i=>{
+            const item = state.items[i]
+            lines.push([
+                label,
+                item.content,
+                item.unique ? item.content : ""
+            ].join(";"))
+        })
+    })
+    saveFile(lines.join("\n"), filename, "text/csv")
+}
+
 function readCSV(file, callback) {
     Papa.parse(file, {
         complete: (results) => {
-            const lines = results.data.map(row=>row[0]);
-            const newState = stateFromLines(lines);
-            console.log(`Loaded ${lines.length} items`);
+            let categories = {};
+            let categoryOrder = [];
+            let items = {};
+            results.data.forEach((row, i)=>{
+                const id = `item-${i}`;
+                const label = ""+row.cluster_label;
+                items[id] = {
+                    id: id,
+                    content: row.idea,
+                    unique: row.unique_idea !== null
+                };
+                if (categories[label] === undefined) {
+                    categoryOrder.push(row.cluster_label);
+                    categories[label] = {
+                        id: label,
+                        title: label,
+                        itemIds: [],
+                    };
+                }
+                categories[row.cluster_label].itemIds.push(id)
+            })
+            const newState = {
+                items: items,
+                categories: categories,
+                categoryOrder: categoryOrder.map(c=>""+c),//.sort((a,b)=>a-b),
+                categoryIdCounter: Math.max(...categoryOrder),
+                doneSorting: false,
+                activeTime: 0
+              };
             callback(newState);
-        }
+        },
+        delimiter: ";",
+        header: true,
+        dynamicTyping: true,
+        skipEmptyLines: true
       });
 }
 
@@ -113,4 +159,4 @@ function readXLSX(file, callback) {
       })
 }
 
-export {saveFile, saveState, readCSV, readJSON, readXLSX}
+export {saveFile, saveState, readCSV, saveCSV, readJSON, readXLSX}

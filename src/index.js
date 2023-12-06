@@ -6,7 +6,7 @@ import {DragDropContext, Droppable} from 'react-beautiful-dnd';
 import initialData from './initial-data';
 import {ActivityTimer} from './ActivityTimer';
 import Row from './category';
-import {saveState, readCSV, readJSON, readXLSX} from './io';
+import {readCSV, readJSON, readXLSX, saveCSV} from './io';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Jumbotron from 'react-bootstrap/Jumbotron';
@@ -20,13 +20,14 @@ const RowContainer = styled.div`
 
 class InnerList extends React.PureComponent {
   render() {
-    const { category, itemMap, index, updateTitle } = this.props;
+    const {category, itemMap, index, updateTitle, toggleUnique} = this.props;
     const items = category.itemIds.map(itemId => itemMap[itemId]);
     return <Row
       category={category}
       items={items}
       index={index}
       updateTitle={updateTitle}
+      toggleUnique={toggleUnique}
     />;
   }
 }
@@ -57,7 +58,7 @@ class App extends React.Component {
   }
 
   saveState = () => {
-    saveState(this.state, this.filename);
+    saveCSV(this.state, this.filename);
   }
 
   onFileUpload = (event) => {
@@ -92,6 +93,20 @@ class App extends React.Component {
         [rowId]: {
           ...this.state.categories[rowId],
           title: newTitle
+        }
+      }
+    }
+    this.setState(newState);
+  }
+
+  toggleUnique = (itemId) => {
+    const newState = {
+      ...this.state,
+      items: {
+        ...this.state.items,
+        [itemId]: {
+          ...this.state.items[itemId],
+          unique: !this.state.items[itemId].unique
         }
       }
     }
@@ -272,6 +287,7 @@ class App extends React.Component {
                     itemMap={this.state.items}
                     index={index}
                     updateTitle={this.updateTitle}
+                    toggleUnique={this.toggleUnique}
                   />
                 );
               })}
