@@ -48,15 +48,6 @@ class App extends React.Component {
     }
   );
 
-  onToggleDoneSorting = (e) => {
-    const checked = e.target.checked;
-    const newState = {
-      ...this.state,
-      doneSorting: checked
-    }
-    this.setState(newState);
-  }
-
   saveState = () => {
     saveCSV(this.state, this.filename);
   }
@@ -134,12 +125,12 @@ class App extends React.Component {
         index: 0
       }
 
-      const newRowOrder = Array.from(this.state.categoryOrder);
-      newRowOrder.push(newId);
+      const newCategoryOrder = Array.from(this.state.categoryOrder);
+      newCategoryOrder.push(newId);
 
       const newState = {
         ...this.state,
-        categoryOrder: newRowOrder,
+        categoryOrder: newCategoryOrder,
         categories: {
           ...this.state.categories,
           [newId]: {
@@ -249,19 +240,9 @@ class App extends React.Component {
           <Form.Group controlId="formFileLg" className="mb-3">
             <Form.File size="lg" onChange={this.onFileUpload}/>
           </Form.Group>
-
-          <Form.Group className="mb-3">
-            <Form.Check
-              type="switch"
-              id="doneSortingSwitch"
-              label="Sorting finished?"
-              title={`Check this when you consider everything sorted into categories (you have spent ${Math.round(this.state.activeTime / 60)} minutes sorting)`}
-              checked={this.state.doneSorting}
-              onChange={this.onToggleDoneSorting}
-            />
-          </Form.Group>
-          <Button variant="primary" onClick={this.saveState} title="
-          Save the current state as a JSON file.">Save current state</Button>
+          <Button variant="primary" onClick={this.saveState}
+            title={`Save the current state as a JSON file (you have spent ${Math.round(this.state.activeTime / 60)} minutes sorting) `}
+          >Save current state</Button>
         </Jumbotron>
       <DragDropContext
         onDragStart={this.onDragStart}

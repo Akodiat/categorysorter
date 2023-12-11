@@ -27,7 +27,6 @@ function saveState(state, filename='categorised.json') {
     });
     const data = {
         categories: categories,
-        doneSorting: state.doneSorting,
         activeTime: state.activeTime
     }
     saveFile(JSON.stringify(data, undefined, 2), filename, 'application/json')
@@ -43,7 +42,6 @@ function readJSON(file, callback) {
             categories: {},
             categoryOrder: [],
             categoryIdCounter: 0,
-            doneSorting: data.doneSorting,
             activeTime: data.activeTime
         };
 
@@ -112,7 +110,6 @@ function readCSV(file, callback) {
                 categories: categories,
                 categoryOrder: categoryOrder.map(c=>""+c),//.sort((a,b)=>a-b),
                 categoryIdCounter: Math.max(...categoryOrder),
-                doneSorting: false,
                 activeTime: 0
               };
             callback(newState);
@@ -143,7 +140,6 @@ function stateFromLines(lines) {
       },
       categoryOrder: ['category-0'],
       categoryIdCounter: 0,
-      doneSorting: false,
       activeTime: 0
     };
 
