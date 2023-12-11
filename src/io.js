@@ -84,34 +84,7 @@ function saveCSV(state, filename="output.csv") {
 function readCSV(file, callback) {
     Papa.parse(file, {
         complete: (results) => {
-            let categories = {};
-            let categoryOrder = [];
-            let items = {};
-            results.data.forEach((row, i)=>{
-                const id = `item-${i}`;
-                const label = ""+row.cluster_label;
-                items[id] = {
-                    id: id,
-                    content: row.idea,
-                    unique: row.unique_idea !== null
-                };
-                if (categories[label] === undefined) {
-                    categoryOrder.push(row.cluster_label);
-                    categories[label] = {
-                        id: label,
-                        title: label,
-                        itemIds: [],
-                    };
-                }
-                categories[row.cluster_label].itemIds.push(id)
-            })
-            const newState = {
-                items: items,
-                categories: categories,
-                categoryOrder: categoryOrder.map(c=>""+c),//.sort((a,b)=>a-b),
-                categoryIdCounter: Math.max(...categoryOrder),
-                activeTime: 0
-              };
+            const newState = stateFromLines(results.data);
             callback(newState);
         },
         delimiter: ";",
@@ -121,36 +94,57 @@ function readCSV(file, callback) {
       });
 }
 
-function stateFromLines(lines) {
-    const items = {};
-    const itemIds =  [];
-    lines.forEach((item, i) => {
-      const id = `item-${i}`;
-      items[id] = {id: id, content: item};
-      itemIds.push(id);
-    });
+function stateFromLines(rows) {
+    let categories = {};
+    let categoryOrder = [];
+    let items = {};
+    rows.forEach((row, i)=>{
+        const id = `item-${i}`;
+        const label = ""+row.cluster_label;
+        items[id] = {
+            id: id,
+            content: row.idea,
+            unique: row.unique_idea !== null
+        };
+        if (categories[label] === undefined) {
+            categoryOrder.push(row.cluster_label);
+            categories[label] = {
+                id: label,
+                title: label,
+                itemIds: [],
+            };
+        }
+        categories[row.cluster_label].itemIds.push(id)
+    })
     const newState = {
-      items: items,
-      categories: {
-        'category-0': {
-          id: 'category-0',
-          title: 'Ungrouped',
-          itemIds: itemIds,
-        },
-      },
-      categoryOrder: ['category-0'],
-      categoryIdCounter: 0,
-      activeTime: 0
-    };
-
+        items: items,
+        categories: categories,
+        categoryOrder: categoryOrder.map(c=>""+c),//.sort((a,b)=>a-b),
+        categoryIdCounter: Math.max(...categoryOrder),
+        activeTime: 0
+      };
     return newState;
 }
 
+
 function readXLSX(file, callback) {
     readXlsxFile(file).then((rows) => {
-        const lines = rows.map(row=>row[0]);
-        const newState = stateFromLines(lines);
-        console.log(`Loaded ${lines.length} items`);
+        let header;
+        let items = [];
+        rows.forEach((row, i)=> {
+            if (i === 0) {
+                header = row
+            } else {
+                const r = {}
+                row.forEach((v,j)=>{
+                    r[header[j]] = v
+                })
+                items.push(r)
+            }
+        }
+        );
+        const newState = stateFromLines(items);
+        console.log(`Loaded ${items.length} items`);
         callback(newState);
       })
 }
