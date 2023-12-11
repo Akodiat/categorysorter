@@ -84,7 +84,6 @@ function saveCSV(state, filename="output.csv") {
 
 function saveXLSX(state, filename="output.xlsx") {
     let lines = [[
-        {value: undefined},
         {value: "cluster_label", type: String, fontWeight: 'bold'},
         {value: "idea", type: String, fontWeight: 'bold'},
         {value: "unique_idea", type: String, fontWeight: 'bold'}]];
@@ -93,7 +92,6 @@ function saveXLSX(state, filename="output.xlsx") {
         category.itemIds.forEach(i=>{
             const item = state.items[i]
             lines.push([
-                {value: undefined},
                 {type: String, value: label},
                 {type: String, value: item.content, wrap: true},
                 {type: String, value: item.unique ? item.content : "", wrap: true}
@@ -101,7 +99,7 @@ function saveXLSX(state, filename="output.xlsx") {
         })
     })
     writeXlsxFile(lines, {
-        columns: [{},{width: 12},{width: 50}, {width: 50}],
+        columns: [{width: 12},{width: 50}, {width: 50}],
         fileName: filename
     })
 }
