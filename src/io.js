@@ -1,5 +1,6 @@
 import Papa from 'papaparse';
 import readXlsxFile from 'read-excel-file'
+import writeXlsxFile from 'write-excel-file'
 
 // Function to save text to a file
 function saveFile(text, filename, type='text/plain') {
@@ -81,6 +82,30 @@ function saveCSV(state, filename="output.csv") {
     saveFile(lines.join("\n"), filename, "text/csv")
 }
 
+function saveXLSX(state, filename="output.xlsx") {
+    let lines = [[
+        {value: undefined},
+        {value: "cluster_label", type: String, fontWeight: 'bold'},
+        {value: "idea", type: String, fontWeight: 'bold'},
+        {value: "unique_idea", type: String, fontWeight: 'bold'}]];
+    state.categoryOrder.forEach(label=>{
+        const category = state.categories[label];
+        category.itemIds.forEach(i=>{
+            const item = state.items[i]
+            lines.push([
+                {value: undefined},
+                {type: String, value: label},
+                {type: String, value: item.content, wrap: true},
+                {type: String, value: item.unique ? item.content : "", wrap: true}
+            ])
+        })
+    })
+    writeXlsxFile(lines, {
+        columns: [{},{width: 12},{width: 50}, {width: 50}],
+        fileName: filename
+    })
+}
+
 function readCSV(file, callback) {
     Papa.parse(file, {
         complete: (results) => {
@@ -149,4 +174,4 @@ function readXLSX(file, callback) {
       })
 }
 
-export {saveFile, saveState, readCSV, saveCSV, readJSON, readXLSX}
+export {saveFile, saveState, readCSV, saveCSV, readJSON, readXLSX, saveXLSX}

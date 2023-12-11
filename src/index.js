@@ -6,7 +6,7 @@ import {DragDropContext, Droppable} from 'react-beautiful-dnd';
 import initialData from './initial-data';
 import {ActivityTimer} from './ActivityTimer';
 import Row from './category';
-import {readCSV, readJSON, readXLSX, saveCSV} from './io';
+import {readCSV, readJSON, readXLSX, saveXLSX} from './io';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Jumbotron from 'react-bootstrap/Jumbotron';
@@ -49,7 +49,7 @@ class App extends React.Component {
   );
 
   saveState = () => {
-    saveCSV(this.state, this.filename);
+    saveXLSX(this.state, this.filename);
   }
 
   onFileUpload = (event) => {
