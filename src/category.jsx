@@ -30,6 +30,10 @@ class InnerList extends React.Component {
     this.props.toggleUnique(id);
   }
 
+  updateContent = (id, value) => {
+    this.props.updateContent(id, value);
+  }
+
   shouldComponentUpdate(nextProps) {
     if (nextProps.items === this.props.items) {
       return false;
@@ -42,7 +46,8 @@ class InnerList extends React.Component {
         key={item.id}
         item={item}
         index={index}
-        toggleUnique={id=>this.toggleUnique(id)}/>
+        toggleUnique={id=>this.toggleUnique(id)}
+        updateContent={this.updateContent}/>
     ));
   }
 }
@@ -50,6 +55,10 @@ class InnerList extends React.Component {
 export default class Row extends React.Component {
   toggleUnique = (id) => {
     this.props.toggleUnique(id);
+  }
+
+  updateContent = (id, value) => {
+    this.props.updateContent(id, value);
   }
 
   updateTitle = (e, props) => {
@@ -80,6 +89,7 @@ export default class Row extends React.Component {
                 >
                 <InnerList
                   items={this.props.items}
+                  updateContent={this.updateContent}
                   toggleUnique={id=>this.toggleUnique(id)}/>
                   {provided.placeholder}
                 </ItemList>

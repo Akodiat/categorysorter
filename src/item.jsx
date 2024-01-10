@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Draggable } from 'react-beautiful-dnd';
+import { EditText } from 'react-edit-text';
 import 'react-edit-text/dist/index.css';
 
 const Container = styled.div`
@@ -32,9 +33,12 @@ function getStyle(style, snapshot, props) {
 }
 
 export default class Item extends React.Component {
-  toggleUnique = (e,props) => {
+  toggleUnique = (e, props) => {
     props.toggleUnique(props.item.id);
     e.preventDefault();
+  }
+  updateContent = (e, props) => {
+    props.updateContent(props.item.id, e.value);
   }
   render() {
     return (
@@ -49,7 +53,10 @@ export default class Item extends React.Component {
             style={getStyle(provided.draggableProps.style, snapshot, this.props)}
             onDoubleClick={e=>this.toggleUnique(e,this.props)}
           >
-          {this.props.item.content}
+          <EditText
+            defaultValue={this.props.item.content}
+            onSave={e=>this.updateContent(e, this.props)}
+          />
           </Container>
         )}
       </Draggable>

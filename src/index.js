@@ -20,13 +20,14 @@ const RowContainer = styled.div`
 
 class InnerList extends React.PureComponent {
   render() {
-    const {category, itemMap, index, updateTitle, toggleUnique} = this.props;
+    const {category, itemMap, index, updateTitle, updateContent, toggleUnique} = this.props;
     const items = category.itemIds.map(itemId => itemMap[itemId]);
     return <Row
       category={category}
       items={items}
       index={index}
       updateTitle={updateTitle}
+      updateContent={updateContent}
       toggleUnique={toggleUnique}
     />;
   }
@@ -84,6 +85,20 @@ class App extends React.Component {
         [rowId]: {
           ...this.state.categories[rowId],
           title: newTitle
+        }
+      }
+    }
+    this.setState(newState);
+  }
+
+  updateContent = (itemId, newContent) => {
+    const newState = {
+      ...this.state,
+      items: {
+        ...this.state.items,
+        [itemId]: {
+          ...this.state.items[itemId],
+          content: newContent
         }
       }
     }
@@ -268,6 +283,7 @@ class App extends React.Component {
                     itemMap={this.state.items}
                     index={index}
                     updateTitle={this.updateTitle}
+                    updateContent={this.updateContent}
                     toggleUnique={this.toggleUnique}
                   />
                 );
